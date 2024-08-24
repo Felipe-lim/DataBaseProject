@@ -1,2 +1,4 @@
 streamlit
 sqlalchemy 
+sqlalchemy psycopg2
+python-dotenv
