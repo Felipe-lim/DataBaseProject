@@ -86,6 +86,10 @@ def get_cliente(db: Session, cpf: str):
 def get_funcionario(db: Session, cpf: str):
     return db.query(Funcionario).filter(Funcionario.cpf == cpf).first()
 
+# Fazer função para pegar todas as informações de todos os usuários
+def get_all_pessoas(db: Session):
+    return db.query(Pessoa).all()
+
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 # UPDATE
