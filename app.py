@@ -26,7 +26,7 @@ st.markdown(
     }
 
     .gradient-text {
-        background: linear-gradient(90deg, #ADD8E6, #000000);
+        background: linear-gradient(90deg, #ADD8E6, #aeeb96);
         -webkit-background-clip: text;
         color: transparent;
         font-size: 2.5em;
