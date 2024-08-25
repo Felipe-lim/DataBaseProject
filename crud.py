@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from models import Pessoa, Fornecedor, Cliente, Funcionario
 from datetime import date
 
@@ -7,7 +8,7 @@ from datetime import date
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def create_pessoa(db: Session,
-                  id:int,
+                  id:str,
                   nome: str, 
                   endereco: str, 
                   email: str, 
@@ -26,7 +27,7 @@ def create_pessoa(db: Session,
     return db_pessoa
 
 def create_fornecedor(db: Session, 
-                      pessoa_id: int, 
+                      pessoa_id: str, 
                       cnpj: str, 
                       setor:str):
     
@@ -39,7 +40,7 @@ def create_fornecedor(db: Session,
     return db_fornecedor
 
 def create_cliente(db: Session, 
-                   pessoa_id: int, 
+                   pessoa_id: str, 
                    cpf: str):
     
     db_cliente = Cliente(pessoa_id=pessoa_id, 
@@ -50,7 +51,7 @@ def create_cliente(db: Session,
     return db_cliente
 
 def create_funcionario(db: Session, 
-                       pessoa_id: int, 
+                       pessoa_id: str, 
                        cpf:str, 
                        cargo: str, 
                        genero:str, 
@@ -74,7 +75,7 @@ def create_funcionario(db: Session,
 # READ
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def get_pessoa(db: Session, pessoa_id: int):
+def get_pessoa(db: Session, pessoa_id: str):
     return db.query(Pessoa).filter(Pessoa.id == pessoa_id).first()
 
 def get_fornecedor(db: Session, cnpj: str):
@@ -90,23 +91,32 @@ def get_funcionario(db: Session, cpf: str):
 def get_all_pessoas(db: Session):
     return db.query(Pessoa).all()
 
-
+def get_all_counts(db: Session):
+	pessoa_count = db.query(func.count(Pessoa.id)).scalar()
+	cliente_count = db.query(func.count(Cliente.pessoa_id)).scalar()
+	fornecedor_count = db.query(func.count(Fornecedor.pessoa_id)).scalar()
+	funcionario_count = db.query(func.count(Funcionario.pessoa_id)).scalar()
+	
+	return {
+		"Pessoas": pessoa_count,
+		"Clientes": cliente_count,
+		"Fornecedores": fornecedor_count,
+		"Funcionários": funcionario_count
+	}
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 # UPDATE
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
 def update_pessoa(db: Session, 
-                  pessoa_id: int,  # Corrigi o tipo do identificador
+                  pessoa_id: str = None,
                   nome: str = None, 
                   endereco: str = None, 
                   email: str = None, 
                   telefone: str = None, 
                   cep: str = None):
     
-    # Primeiro, busque a pessoa pelo ID
     db_pessoa = get_pessoa(db, pessoa_id=pessoa_id)
     
-    # Verifique se a pessoa foi encontrada e atualize os campos que não são None
     if db_pessoa:
         if nome is not None:
             db_pessoa.nome = nome
@@ -119,61 +129,68 @@ def update_pessoa(db: Session,
         if cep is not None:
             db_pessoa.cep = cep
         
-        # Commit das mudanças
         db.commit()
         db.refresh(db_pessoa)
     
     return db_pessoa
 
 def update_fornecedor(db: Session, 
-                      pessoa_id: int, 
-                      cnpj: str, 
-                      setor:str):
+                      pessoa_id: str, 
+                      cnpj: str = None, 
+                      setor: str = None):
     
     db_fornecedor = get_fornecedor(db, cnpj=cnpj)
     if db_fornecedor:
-        db_fornecedor.setor = setor
+        if cnpj is not None:
+            db_fornecedor.cnpj = cnpj
+        if setor is not None:
+            db_fornecedor.setor = setor
         db.commit()
         db.refresh(db_fornecedor)
     return db_fornecedor
 
 def update_cliente(db: Session, 
-                   pessoa_id: int, 
-                   cpf: str):
+                   cpf: str = None):
     
-    db_cliente = get_cliente(db, cpf=cpf)
-    if db_cliente:
+    db_cliente = get_cliente(db, cpf)
+    if db_cliente and cpf is not None:
         db_cliente.cpf = cpf
         db.commit()
         db.refresh(db_cliente)
     return db_cliente
 
 def update_funcionario(db: Session, 
-                       pessoa_id: int, 
-                       cpf: str, 
-                       cargo: str, 
-                       genero: str, 
-                       nascimento: date, 
-                       naturalidade: str, 
-                       salario: int):
+                       pessoa_id: str, 
+                       cpf: str = None, 
+                       cargo: str = None, 
+                       genero: str = None, 
+                       nascimento: date = None, 
+                       naturalidade: str = None, 
+                       salario: int = None):
 
     db_funcionario = get_funcionario(db, cpf=cpf)
     if db_funcionario:
-        db_funcionario.cargo = cargo
-        db_funcionario.genero = genero
-        db_funcionario.nascimento = nascimento
-        db_funcionario.naturalidade = naturalidade
-        db_funcionario.salario = salario
+        if cpf is not None:
+            db_funcionario.cpf = cpf
+        if cargo is not None:
+            db_funcionario.cargo = cargo
+        if genero is not None:
+            db_funcionario.genero = genero
+        if nascimento is not None:
+            db_funcionario.nascimento = nascimento
+        if naturalidade is not None:
+            db_funcionario.naturalidade = naturalidade
+        if salario is not None:
+            db_funcionario.salario = salario
         db.commit()
         db.refresh(db_funcionario)
     return db_funcionario
-
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 # DELETE
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-def delete_pessoa(db: Session, pessoa_id: int):
+def delete_pessoa(db: Session, pessoa_id: str):
     db_pessoa = get_pessoa(db, pessoa_id)
     if db_pessoa:
         db.delete(db_pessoa)
