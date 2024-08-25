@@ -5,7 +5,7 @@ from database import Base
 class Pessoa(Base):
     __tablename__ = "pessoas"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)
     nome = Column(String, index=True)
     endereco = Column(String)
     email = Column(String)
@@ -20,7 +20,7 @@ class Pessoa(Base):
 class Fornecedor(Base):
     __tablename__ = "fornecedores"
 
-    pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
+    pessoa_id = Column(String, ForeignKey("pessoas.id"))
     cnpj = Column(String, primary_key=True, index=True)
     setor = Column(String)
     
@@ -30,7 +30,7 @@ class Fornecedor(Base):
 class Cliente(Base):
     __tablename__ = "clientes"
 
-    pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
+    pessoa_id = Column(String, ForeignKey("pessoas.id"))
     cpf = Column(String, primary_key=True, index=True)
 
     pessoa = relationship("Pessoa", back_populates="cliente")
@@ -38,7 +38,7 @@ class Cliente(Base):
 class Funcionario(Base):
     __tablename__ = "funcionarios"
 
-    pessoa_id = Column(Integer, ForeignKey("pessoas.id"))
+    pessoa_id = Column(String, ForeignKey("pessoas.id"))
     cpf = Column(String, primary_key=True, index=True)
     cargo = Column(String)
     genero = Column(String)
