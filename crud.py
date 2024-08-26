@@ -134,15 +134,15 @@ def update_pessoa(db: Session,
     
     return db_pessoa
 
-def update_fornecedor(db: Session, 
-                      pessoa_id: str, 
-                      cnpj: str = None, 
+def update_fornecedor(db: Session,  
+                      cnpj_atual: str = None,
+                      cnpj_novo: str = None, 
                       setor: str = None):
     
-    db_fornecedor = get_fornecedor(db, cnpj=cnpj)
+    db_fornecedor = get_fornecedor(db, cnpj=cnpj_atual)
     if db_fornecedor:
-        if cnpj is not None:
-            db_fornecedor.cnpj = cnpj
+        if cnpj_novo is not None:
+            db_fornecedor.cnpj = cnpj_novo
         if setor is not None:
             db_fornecedor.setor = setor
         db.commit()
@@ -161,17 +161,18 @@ def update_cliente(db: Session,
 
 def update_funcionario(db: Session, 
                        pessoa_id: str, 
-                       cpf: str = None, 
+                       cpf_atual: str = None,
+                       cpf_novo: str = None, 
                        cargo: str = None, 
                        genero: str = None, 
                        nascimento: date = None, 
                        naturalidade: str = None, 
                        salario: int = None):
 
-    db_funcionario = get_funcionario(db, cpf=cpf)
+    db_funcionario = get_funcionario(db, cpf=cpf_atual)
     if db_funcionario:
-        if cpf is not None:
-            db_funcionario.cpf = cpf
+        if cpf_novo is not None:
+            db_funcionario.cpf = cpf_novo
         if cargo is not None:
             db_funcionario.cargo = cargo
         if genero is not None:

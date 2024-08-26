@@ -69,8 +69,9 @@ def validate_input(fields):
 
 
 if page == "Start":
+    st.markdown(css, unsafe_allow_html=True)
     st.markdown(
-        '<h1 class="gradient-text">Bem-vindo ao CLOROFILA TECH</h1>',
+        '<h1>Bem-vindo ao CLOROFILA TECH</h1>',
         unsafe_allow_html=True,
     )
     st.write("Somos um sistema de gerenciamento de ervas finas")
@@ -167,7 +168,7 @@ elif page == "Manage Users":
         )
 
         if read_option == "Buscar usuário específico":
-            identifier = st.text_input("Digite o UUID, CPF ou CNPJ do usuário")
+            identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
             if st.button("Obter informações"):
                 if validate_input({"Identificador": identifier}):
                     db = next(get_db())
@@ -219,9 +220,8 @@ elif page == "Manage Users":
     elif operation == "Update":
       st.subheader("Atualizar informações de um usuário")
       
-      identifier = st.text_input("Digite o UUID, CPF ou CNPJ do usuário")
+      identifier = st.text_input("CPF ou CNPJ do usuário")
       
-      # Variável para armazenar se o usuário foi encontrado
       user_found = False
       db = next(get_db())
       if st.button("Buscar usuário"):
@@ -233,7 +233,6 @@ elif page == "Manage Users":
                      user_found = True
                      st.success("Usuário encontrado! Preencha os campos abaixo para atualizar.")
                      
-                     # Armazena dados encontrados em variáveis de estado
                      st.session_state["user"] = user
                      st.session_state["pessoa"] = pessoa
                   else:
@@ -241,7 +240,6 @@ elif page == "Manage Users":
                except Exception as e:
                   st.error(f"Erro ao buscar usuário: {str(e)}")
 
-      # Se o usuário foi encontrado, exibe o formulário de atualização
       if "user" in st.session_state and "pessoa" in st.session_state:
          user = st.session_state["user"]
          pessoa = st.session_state["pessoa"]
@@ -254,27 +252,37 @@ elif page == "Manage Users":
                cep = st.text_input("CEP", value=pessoa.cep)
 
                if user_type == "Cliente":
-                  cpf = st.text_input("CPF", value=user.cpf)
+                  try:
+                     cpf = st.text_input("CPF", value=user.cpf)
+                  except:
+                      pass
                elif user_type == "Fornecedor":
-                  cnpj = st.text_input("CNPJ", value=user.cnpj)
-                  setor = st.text_input("Setor", value=user.setor)
+                  try:
+                     cnpj_atual = st.text_input("CNPJ Atual", value=user.cnpj,disabled=True)
+                     cnpj_novo = st.text_input("CNPJ Novo", value=user.cnpj)
+                     setor = st.text_input("Setor", value=user.setor)
+                  except:  
+                      pass
                elif user_type == "Funcionário":
-                  cpf = st.text_input("CPF", value=user.cpf)
-                  cargo = st.text_input("Cargo", value=user.cargo)
-                  genero = st.selectbox(
-                     "Gênero", ["Masculino", "Feminino", "Outro"],
-                     index=["Masculino", "Feminino", "Outro"].index(user.genero)
-                  )
-                  nascimento = st.date_input(
-                     "Data de Nascimento", value=user.nascimento
-                  )
-                  naturalidade = st.text_input(
-                     "Naturalidade", value=user.naturalidade
-                  )
-                  salario = st.number_input(
-                     "Salário", value=user.salario, min_value=0, step=100
-                  )
-
+                  try:
+                     cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
+                     cpf_novo = st.text_input("CPF Novo", value=user.cpf)
+                     cargo = st.text_input("Cargo", value=user.cargo)
+                     genero = st.selectbox(
+                        "Gênero", ["Masculino", "Feminino", "Outro"],
+                        index=["Masculino", "Feminino", "Outro"].index(user.genero)
+                     )
+                     nascimento = st.date_input(
+                        "Data de Nascimento", value=user.nascimento
+                     )
+                     naturalidade = st.text_input(
+                        "Naturalidade", value=user.naturalidade
+                     )
+                     salario = st.number_input(
+                        "Salário", value=user.salario, min_value=0, step=100
+                     )
+                  except:
+                     pass
                submit_button = st.form_submit_button(label="Atualizar")
 
          if submit_button:
@@ -285,19 +293,23 @@ elif page == "Manage Users":
                   "Telefone": telefone,
                   "CEP": cep,
                }
-               if user_type == "Cliente":
-                  fields["CPF"] = cpf
-               elif user_type == "Fornecedor":
-                  fields["CNPJ"] = cnpj
-                  fields["Setor"] = setor
-               elif user_type == "Funcionário":
-                  fields["CPF"] = cpf
-                  fields["Cargo"] = cargo
-                  fields["Gênero"] = genero
-                  fields["Data de Nascimento"] = nascimento
-                  fields["Naturalidade"] = naturalidade
-                  fields["Salário"] = salario
-
+               try:
+                  if user_type == "Cliente":
+                        fields["CPF"] = cpf
+                  elif user_type == "Fornecedor":
+                     fields["CNPJ Atual"] = cnpj_atual
+                     fields["CNPJ Novo"] = cnpj_novo
+                     fields["Setor"] = setor
+                  elif user_type == "Funcionário":
+                     fields["CPF ATUAL"] = cpf_atual
+                     fields["CPF NOVO"] = cpf_novo
+                     fields["Cargo"] = cargo
+                     fields["Gênero"] = genero
+                     fields["Data de Nascimento"] = nascimento
+                     fields["Naturalidade"] = naturalidade
+                     fields["Salário"] = salario
+               except:
+                   pass
                if validate_input(fields):
                   try:
                      update_pessoa(db, pessoa.id, nome, endereco, email, telefone, cep)
@@ -305,9 +317,9 @@ elif page == "Manage Users":
                      if user_type == "Cliente":
                            update_cliente(db,cpf)
                      elif user_type == "Fornecedor":
-                           update_fornecedor(db, user.pessoa_id, cnpj, setor)
+                           update_fornecedor(db, cnpj_atual, cnpj_novo , setor)
                      elif user_type == "Funcionário":
-                           update_funcionario(db, user.pessoa_id, cpf, cargo, genero, nascimento, naturalidade, salario)
+                           update_funcionario(db, user.pessoa_id, cpf_atual,cpf_novo, cargo, genero, nascimento, naturalidade, salario)
                      
                      st.success(f"Usuário '{nome}' atualizado com sucesso!")
                   except Exception as e:
@@ -317,7 +329,7 @@ elif page == "Manage Users":
 
     elif operation == "Delete":
         st.subheader("Deletar um usuário")
-        identifier = st.text_input("Digite o UUID, CPF ou CNPJ do usuário")
+        identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
         if st.button("Deletar"):
             if validate_input({"Identificador": identifier}):
                 db = next(get_db())
