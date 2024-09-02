@@ -41,10 +41,14 @@ def create_fornecedor(db: Session,
 
 def create_cliente(db: Session, 
                    pessoa_id: str, 
-                   cpf: str):
+                   cpf: str,
+                   time: str,
+                   one_piece: bool):
     
     db_cliente = Cliente(pessoa_id=pessoa_id, 
-                         cpf=cpf)
+                         cpf=cpf,
+                         time=time,
+                         one_piece=one_piece)
     db.add(db_cliente)
     db.commit()
     db.refresh(db_cliente)
@@ -150,11 +154,15 @@ def update_fornecedor(db: Session,
     return db_fornecedor
 
 def update_cliente(db: Session, 
-                   cpf: str = None):
+                   cpf: str,
+                   time: str,
+                   one_piece: bool):
     
     db_cliente = get_cliente(db, cpf)
     if db_cliente and cpf is not None:
         db_cliente.cpf = cpf
+        db_cliente.time = time,
+        db_cliente = one_piece,
         db.commit()
         db.refresh(db_cliente)
     return db_cliente

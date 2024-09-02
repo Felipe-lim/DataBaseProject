@@ -2,7 +2,11 @@ import streamlit as st
 import streamlit.components.v1 as components
 import os, uuid
 from css import css
-from crud import *
+from controllers.cliente import *
+from controllers.fornecedor import *
+from controllers.funcionario import *
+from controllers.general import *
+from controllers.pessoas import *
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -24,6 +28,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 st.sidebar.title("Navegação")
 page = st.sidebar.radio("Ir para:", ["Start", "Manage Users","Relatórios"])
 
+def buscar_valor(lista, valor):
+    for i in range(len(lista)):
+        if lista[i] == valor:
+            return i
+    return -1
 
 def get_db():
     db = SessionLocal()
@@ -100,6 +109,8 @@ elif page == "Manage Users":
 
             if user_type == "Cliente":
                 cpf = st.text_input("CPF")
+                time = st.text_input("Time")
+                one_piece = st.selectbox('One Piece:', ['', 'Assiste', 'Não assiste'])
             elif user_type == "Fornecedor":
                 cnpj = st.text_input("CNPJ")
                 setor = st.text_input("Setor")
@@ -123,6 +134,8 @@ elif page == "Manage Users":
             }
             if user_type == "Cliente":
                 fields["CPF"] = cpf
+                fields["Time"] = time
+                fields["One Piece"] = one_piece
             elif user_type == "Fornecedor":
                 fields["CNPJ"] = cnpj
                 fields["Setor"] = setor
@@ -142,7 +155,7 @@ elif page == "Manage Users":
                         db, user_id, nome, endereco, email, telefone, cep
                     )
                     if user_type == "Cliente":
-                        create_cliente(db, pessoa.id, cpf)
+                        create_cliente(db, pessoa.id, cpf, time, one_piece)
                     elif user_type == "Fornecedor":
                         create_fornecedor(db, pessoa.id, cnpj, setor)
                     elif user_type == "Funcionário":
@@ -253,7 +266,10 @@ elif page == "Manage Users":
 
                if user_type == "Cliente":
                   try:
-                     cpf = st.text_input("CPF", value=user.cpf)
+                     cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
+                     cpf_novo = st.text_input("CPF Novo", value=user.cpf)
+                     time = st.text_input("Time", value=user.time)
+                     one_piece = st.selectbox("One Piece:", ['','Assiste', 'Não assiste'], index=buscar_valor(['','Assiste', 'Não assiste'], user.one_piece))
                   except:
                       pass
                elif user_type == "Fornecedor":
@@ -295,19 +311,22 @@ elif page == "Manage Users":
                }
                try:
                   if user_type == "Cliente":
-                        fields["CPF"] = cpf
+                    fields["CPF Atual"] = cpf_atual
+                    fields["CPF Novo"] = cpf_novo
+                    fields["Time"] = time
+                    fields["One Piece"] = one_piece
                   elif user_type == "Fornecedor":
-                     fields["CNPJ Atual"] = cnpj_atual
-                     fields["CNPJ Novo"] = cnpj_novo
-                     fields["Setor"] = setor
+                    fields["CNPJ Atual"] = cnpj_atual
+                    fields["CNPJ Novo"] = cnpj_novo
+                    fields["Setor"] = setor
                   elif user_type == "Funcionário":
-                     fields["CPF ATUAL"] = cpf_atual
-                     fields["CPF NOVO"] = cpf_novo
-                     fields["Cargo"] = cargo
-                     fields["Gênero"] = genero
-                     fields["Data de Nascimento"] = nascimento
-                     fields["Naturalidade"] = naturalidade
-                     fields["Salário"] = salario
+                    fields["CPF Atual"] = cpf_atual
+                    fields["CPF Novo"] = cpf_novo
+                    fields["Cargo"] = cargo
+                    fields["Gênero"] = genero
+                    fields["Data de Nascimento"] = nascimento
+                    fields["Naturalidade"] = naturalidade
+                    fields["Salário"] = salario
                except:
                    pass
                if validate_input(fields):
@@ -315,7 +334,7 @@ elif page == "Manage Users":
                      update_pessoa(db, pessoa.id, nome, endereco, email, telefone, cep)
                      
                      if user_type == "Cliente":
-                           update_cliente(db,cpf)
+                           update_cliente(db,cpf_atual, cpf_novo, time, one_piece)
                      elif user_type == "Fornecedor":
                            update_fornecedor(db, cnpj_atual, cnpj_novo , setor)
                      elif user_type == "Funcionário":
