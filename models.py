@@ -26,6 +26,7 @@ class Fornecedor(Base):
     setor = Column(String)
     
     pessoa = relationship("Pessoa", back_populates="fornecedor")
+    compra = relationship("Compra")
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Cliente(Base):
@@ -37,6 +38,7 @@ class Cliente(Base):
     one_piece = Column(String) #atualizar no streamlit 
 
     pessoa = relationship("Pessoa", back_populates="cliente")
+    venda = relationship("Venda")
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Funcionario(Base):
@@ -51,6 +53,7 @@ class Funcionario(Base):
     salario = Column(Integer)
     
     pessoa = relationship("Pessoa", back_populates="funcionario")
+    venda = relationship("Venda")
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Catalogo(Base):
@@ -85,6 +88,7 @@ class Estoque(Base):
         PrimaryKeyConstraint('especie', 'variedade'),
         ForeignKeyConstraint(['especie', 'variedade'], ['catalogo.especie', 'catalogo.variedade']),
     )
+
     catalogo = relationship("Catalogo", back_populates="estoque", uselist=True)
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -93,25 +97,35 @@ class Venda(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     data = Column(Date)
-    especie = Column(String)
-    variedade = Column(String)
     comprador_id = Column(String, ForeignKey("clientes.cpf"))
     vendedor_id = Column(String, ForeignKey("funcionarios.cpf"))
-    quantidade = Column(Integer)
+    preco_normal = Column(Integer)
     desconto = Column(Integer)
+    preco_final = Column(Integer)
     forma_pagamento = Column(String)
     status_pagamento = Column(String)
-    preco_final = Column(Integer)
-    preco_normal = Column(Integer)
+
+    cliente = relationship("Cliente", back_populates="vendas")
+    funcionario = relationship("Funcionario", back_populates="vendas")
+    carrinho = relationship("Carrinho", back_populates="vendas")
+
+# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+class Carrinho(Base):
+    __tablename__ = "carrinho"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    id_venda = Column(Integer, ForeignKey("vendas.id"))
+    especie = Column(String)
+    variedade = Column(String)
+    quantidade = Column(Integer)
 
     __table_args__ = (
         ForeignKeyConstraint(['especie', 'variedade'], ['estoque.especie', 'estoque.variedade']),
     )
 
-    produto = relationship("Estoque")
-    comprador = relationship("Cliente")
-    vendedor = relationship("Funcionario")
-
+    estoque = relationship("Estoque", back_populates="carrinho")
+    venda = relationship("Venda", back_populates="carrinho")
+    
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Compra(Base):
     __tablename__ = "compras"
@@ -130,7 +144,7 @@ class Compra(Base):
         ForeignKeyConstraint(['especie', 'variedade'], ['catalogo.especie', 'catalogo.variedade']),
     )
 
-    fornecedor = relationship("Fornecedor")
-    catalogo = relationship("Catalogo")
+    fornecedor = relationship("Fornecedor", back_populates="compras")
+    catalogo = relationship("Catalogo", back_populates="compras")
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
