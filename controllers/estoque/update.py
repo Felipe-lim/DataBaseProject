@@ -3,29 +3,6 @@ from models import Estoque
 from sqlalchemy import and_
 
 
-def create_estoque(db: Session, 
-                   especie: str, 
-                   variedade: str,
-                   quantidade: int,
-                   fornecedor: str,
-                   custo: int,
-                   preco: int):
-    
-    db_estoque = Estoque(especie=especie, 
-                         variedade=variedade,
-                         quantidade=quantidade,
-                         fornecedor=fornecedor,
-                         custo=custo,
-                         preco=preco)
-    db.add(db_estoque)
-    db.commit()
-    db.refresh(db_estoque)
-    return db_estoque
-
-
-def get_estoque(db: Session, especie: str, variedade: str):
-    return db.query(Estoque).filter(and_(Estoque.especie == especie, Estoque.variedade == variedade)).first()
-
 
 def update_estoque(db: Session, 
                    especie_atual: str,
@@ -56,9 +33,3 @@ def update_estoque(db: Session,
         db.refresh(db_estoque)
     return db_estoque
 
-
-def delete_estoque(db: Session, especie: str, variedade: str):
-    db_estoque = get_estoque(db, especie, variedade)
-    if db_estoque:
-        db.delete(db_estoque)
-        db.commit()

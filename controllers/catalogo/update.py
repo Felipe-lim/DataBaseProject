@@ -7,33 +7,6 @@ from datetime import date
 from sqlalchemy.orm import Session
 from models import Catalogo
 
-def create_catalogo(db: Session, 
-                           especie: str, 
-                           variedade: str,
-                           nome_popular: str,
-                           origem: str,
-                           ambiente: str,
-                           cuidado: str,
-                           utilidade: str):
-    
-    db_catalogo = Catalogo(especie=especie, 
-                                  variedade=variedade,
-                                  nome_popular=nome_popular,
-                                  origem=origem,
-                                  ambiente=ambiente,
-                                  cuidado=cuidado,
-                                  utilidade=utilidade)
-    
-    db.add(db_catalogo)
-    db.commit()
-    db.refresh(db_catalogo)
-    return db_catalogo
-
-
-def get_catalogo(db: Session, especie: str, variedade: str):
-    return db.query(Catalogo).filter(and_(Catalogo.especie == especie, Catalogo.variedade == variedade)).first()
-
-
 def update_catalogue(db: Session, 
                      especie_atual: str,
                      especie_nova: str,  
@@ -67,9 +40,3 @@ def update_catalogue(db: Session,
 
     return db_catalogo
 
-
-def delete_catalogo(db:Session, especie:str, variedade:str):
-    db_catalogo = get_catalogo(db, especie, variedade)
-    if db_catalogo:
-        db.delete(db_catalogo)
-        db.commit()

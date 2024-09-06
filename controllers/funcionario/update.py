@@ -4,31 +4,6 @@ from models import Funcionario
 from datetime import date
 
 
-def create_funcionario(db: Session, 
-                       pessoa_id: str, 
-                       cpf:str, 
-                       cargo: str, 
-                       genero:str, 
-                       nascimento:date, 
-                       naturalidade:str, 
-                       salario: int):
-    
-    db_funcionario = Funcionario(pessoa_id=pessoa_id, 
-                                 cpf=cpf, cargo=cargo, 
-                                 genero=genero, 
-                                 nascimento=nascimento, 
-                                 naturalidade=naturalidade,
-                                 salario=salario)
-    db.add(db_funcionario)
-    db.commit()
-    db.refresh(db_funcionario)
-    return db_funcionario
-
-
-def get_funcionario(db: Session, cpf: str):
-    return db.query(Funcionario).filter(Funcionario.cpf == cpf).first()
-
-
 def update_funcionario(db: Session, 
                        pessoa_id: str, 
                        cpf_atual: str = None,
@@ -56,10 +31,3 @@ def update_funcionario(db: Session,
         db.commit()
         db.refresh(db_funcionario)
     return db_funcionario
-
-
-def delete_funcionario(db: Session, cpf: str):
-    db_funcionario = get_funcionario(db, cpf)
-    if db_funcionario:
-        db.delete(db_funcionario)
-        db.commit()

@@ -3,31 +3,6 @@ from models import Compra
 from datetime import date
 
 
-def create_compra(db: Session, 
-                  data: date,
-                  fornecedor_cnpj: str,
-                  quantidade: int,
-                  especie: str,
-                  variedade: str,
-                  custo: int,
-                  forma_pagamento: str):
-    
-    db_compra = Compra(data=data,
-                       fornecedor_cnpj=fornecedor_cnpj,
-                       quantidade=quantidade,
-                       especie=especie,
-                       variedade=variedade,
-                       custo=custo,
-                       forma_pagamento=forma_pagamento)
-    
-    db.add(db_compra)
-    db.commit()
-    db.refresh(db_compra)
-    return db_compra
-
-
-def get_compra(db: Session, compra_id: int):
-    return db.query(Compra).filter(Compra.id == compra_id).first()
 
 
 def update_compra(db: Session, 
@@ -60,12 +35,3 @@ def update_compra(db: Session,
         db.commit()
         db.refresh(db_compra)
     return db_compra
-
-
-def delete_compra(db: Session, compra_id: int):
-    db_compra = get_compra(db, compra_id)
-    if db_compra:
-        db.delete(db_compra)
-        db.commit()
-        return True
-    return False
