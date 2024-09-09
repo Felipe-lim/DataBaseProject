@@ -2,7 +2,6 @@ from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean, Prima
 from sqlalchemy.orm import relationship
 from database import Base
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Pessoa(Base):
     __tablename__ = "pessoas"
 
@@ -15,9 +14,8 @@ class Pessoa(Base):
 
     fornecedor = relationship("Fornecedor", back_populates="pessoa", uselist=False)
     cliente = relationship("Cliente", back_populates="pessoa", uselist=False)
-    funcionario = relationship("Funcionario", back_populates="pessoa", uselist=False) 
+    funcionario = relationship("Funcionario", back_populates="pessoa", uselist=False)
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Fornecedor(Base):
     __tablename__ = "fornecedores"
 
@@ -26,9 +24,8 @@ class Fornecedor(Base):
     setor = Column(String)
     
     pessoa = relationship("Pessoa", back_populates="fornecedor")
-    compra = relationship("Compra")
+    compras = relationship("Compra", back_populates="fornecedor")  # Corrigido para plural
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Cliente(Base):
     __tablename__ = "clientes"
 
@@ -38,9 +35,9 @@ class Cliente(Base):
     one_piece = Column(String) #atualizar no streamlit 
 
     pessoa = relationship("Pessoa", back_populates="cliente")
-    venda = relationship("Venda")
+    vendas = relationship("Venda", back_populates='cliente')  # Corrigido para plural
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+
 class Funcionario(Base):
     __tablename__ = "funcionarios"
 
@@ -53,9 +50,8 @@ class Funcionario(Base):
     salario = Column(Integer)
     
     pessoa = relationship("Pessoa", back_populates="funcionario")
-    venda = relationship("Venda")
+    vendas = relationship("Venda", back_populates="funcionario")  # Corrigido para plural
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Catalogo(Base):
     __tablename__ = "catalogo"
 
@@ -71,9 +67,9 @@ class Catalogo(Base):
         PrimaryKeyConstraint('especie', 'variedade'),
     )
 
-    estoque = relationship("Estoque", back_populates="catalogo", uselist=False)
+    estoque = relationship("Estoque", back_populates="catalogo", uselist=False)  # Corrigido para False
+    compras = relationship("Compra", back_populates="catalogo")  # Adicionado para definir o relacionamento inverso
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Estoque(Base):
     __tablename__ = "estoque"
 
@@ -89,9 +85,9 @@ class Estoque(Base):
         ForeignKeyConstraint(['especie', 'variedade'], ['catalogo.especie', 'catalogo.variedade']),
     )
 
-    catalogo = relationship("Catalogo", back_populates="estoque", uselist=True)
+    catalogo = relationship("Catalogo", back_populates="estoque", uselist=False)  # Corrigido para False
+    carrinho = relationship("Carrinho", back_populates="estoque")  # Adicionado para definir o relacionamento inverso
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Venda(Base):
     __tablename__ = "vendas"
 
@@ -105,11 +101,10 @@ class Venda(Base):
     forma_pagamento = Column(String)
     status_pagamento = Column(String)
 
-    cliente = relationship("Cliente", back_populates="vendas")
-    funcionario = relationship("Funcionario", back_populates="vendas")
-    carrinho = relationship("Carrinho", back_populates="vendas")
+    cliente = relationship("Cliente", back_populates="vendas")  # Certifique-se de que está correto
+    funcionario = relationship("Funcionario", back_populates="vendas")  # Certifique-se de que está correto
+    carrinho = relationship("Carrinho", back_populates="venda")  # Certifique-se de que o relacionamento é singular
 
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Carrinho(Base):
     __tablename__ = "carrinho"
 
@@ -126,7 +121,6 @@ class Carrinho(Base):
     estoque = relationship("Estoque", back_populates="carrinho")
     venda = relationship("Venda", back_populates="carrinho")
     
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 class Compra(Base):
     __tablename__ = "compras"
 
@@ -139,12 +133,9 @@ class Compra(Base):
     custo = Column(Integer)
     forma_pagamento = Column(String)
 
-    # Definindo a chave estrangeira para catálogo
     __table_args__ = (
         ForeignKeyConstraint(['especie', 'variedade'], ['catalogo.especie', 'catalogo.variedade']),
     )
 
     fornecedor = relationship("Fornecedor", back_populates="compras")
     catalogo = relationship("Catalogo", back_populates="compras")
-
-# * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
