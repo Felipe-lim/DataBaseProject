@@ -62,3 +62,7 @@ def delete_estoque(db: Session, especie: str, variedade: str):
     if db_estoque:
         db.delete(db_estoque)
         db.commit()
+
+
+def get_all_estoque(db: Session):
+    return db.query(Estoque).all()

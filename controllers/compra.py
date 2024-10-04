@@ -69,3 +69,7 @@ def delete_compra(db: Session, compra_id: int):
         db.commit()
         return True
     return False
+
+# Função para buscar todas as compras cadastradas
+def get_all_compras(db: Session):
+    return db.query(Compra).all()

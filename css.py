@@ -16,9 +16,7 @@ css ="""
     
     }
 
-    .stSidebar > div > div {
-        background: linear-gradient(90deg, #ADD8E6, #000000);
-    }
+    
 
     .gradient-text {
         background: linear-gradient(90deg, #ADD8E6, #aeeb96);

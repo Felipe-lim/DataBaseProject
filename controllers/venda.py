@@ -1,7 +1,32 @@
 from sqlalchemy.orm import Session
 from models import Venda
 from datetime import date
+from controllers.pessoas import get_pessoa 
 
+
+def get_venda(db: Session, venda_id: int):
+    return db.query(Venda).filter(Venda.id == venda_id).first()
+
+def get_all_vendas(db: Session):
+    return db.query(Venda).all()
+
+def delete_venda(db: Session, venda_id: int):
+    db_venda = get_venda(db, venda_id)
+    if db_venda:
+        db.delete(db_venda)
+        db.commit()
+        return True
+    return False
+
+def calculate_discount(endereco, time, one_piece):
+    discount = 0
+    if endereco.lower() == "sousa":
+        discount += 5
+    if time.lower() == "flamengo":
+        discount += 5
+    if one_piece:
+        discount += 5
+    return discount
 
 def create_venda(db: Session, 
                  data: date,
@@ -13,6 +38,23 @@ def create_venda(db: Session,
                  forma_pagamento: str,
                  status_pagamento: str):
     
+    # Buscar as informações do comprador no banco de dados
+    comprador = get_pessoa(db, comprador_id)
+    if not comprador:
+        raise Exception("Comprador não encontrado no banco de dados")
+
+    # Extrair as informações relevantes para o cálculo do desconto
+    endereco = comprador.endereco
+    time = comprador.time  # Supondo que você tenha um campo "time" na tabela Pessoa
+    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Pessoa
+
+    # Calcula o desconto adicional com base nas informações do banco de dados
+    desconto += calculate_discount(endereco, time, one_piece)
+    
+    # Recalcula o preço final
+    preco_final = preco_normal - (preco_normal * (desconto / 100))
+    
+    # Cria a venda no banco de dados
     db_venda = Venda(data=data,
                      comprador_id=comprador_id,
                      vendedor_id=vendedor_id,
@@ -28,10 +70,6 @@ def create_venda(db: Session,
     return db_venda
 
 
-def get_venda(db: Session, venda_id: int):
-    return db.query(Venda).filter(Venda.id == venda_id).first()
-
-
 def update_venda(db: Session, 
                  venda_id: int,
                  data: date = None,
@@ -44,33 +82,43 @@ def update_venda(db: Session,
                  status_pagamento: str = None):
     
     db_venda = get_venda(db, venda_id)
-    if db_venda:
-        if data is not None:
-            db_venda.data = data
-        if comprador_id is not None:
-            db_venda.comprador_id = comprador_id
-        if vendedor_id is not None:
-            db_venda.vendedor_id = vendedor_id
-        if preco_normal is not None:
-            db_venda.preco_normal = preco_normal
-        if desconto is not None:
-            db_venda.desconto = desconto
-        if preco_final is not None:
-            db_venda.preco_final = preco_final
-        if forma_pagamento is not None:
-            db_venda.forma_pagamento = forma_pagamento
-        if status_pagamento is not None:
-            db_venda.status_pagamento = status_pagamento
-        
-        db.commit()
-        db.refresh(db_venda)
+    if not db_venda:
+        raise Exception("Venda não encontrada no banco de dados")
+
+    # Buscar as informações do comprador no banco de dados
+    comprador = get_pessoa(db, comprador_id)
+    if not comprador:
+        raise Exception("Comprador não encontrado no banco de dados")
+
+    # Extrair as informações relevantes para o cálculo do desconto
+    endereco = comprador.endereco
+    time = comprador.time  # Supondo que você tenha um campo "time" na tabela Pessoa
+    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Pessoa
+
+    # Calcula o desconto adicional com base nas informações do banco de dados
+    desconto += calculate_discount(endereco, time, one_piece)
+    
+    # Recalcula o preço final
+    preco_final = preco_normal - (preco_normal * (desconto / 100))
+
+    # Atualiza os campos da venda se forem fornecidos
+    if data is not None:
+        db_venda.data = data
+    if comprador_id is not None:
+        db_venda.comprador_id = comprador_id
+    if vendedor_id is not None:
+        db_venda.vendedor_id = vendedor_id
+    if preco_normal is not None:
+        db_venda.preco_normal = preco_normal
+    if desconto is not None:
+        db_venda.desconto = desconto
+    if preco_final is not None:
+        db_venda.preco_final = preco_final
+    if forma_pagamento is not None:
+        db_venda.forma_pagamento = forma_pagamento
+    if status_pagamento is not None:
+        db_venda.status_pagamento = status_pagamento
+    
+    db.commit()
+    db.refresh(db_venda)
     return db_venda
-
-
-def delete_venda(db: Session, venda_id: int):
-    db_venda = get_venda(db, venda_id)
-    if db_venda:
-        db.delete(db_venda)
-        db.commit()
-        return True
-    return False
