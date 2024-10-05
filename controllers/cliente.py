@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Cliente
+from database.models import Cliente
 from datetime import date
 
 def create_cliente(db: Session, 

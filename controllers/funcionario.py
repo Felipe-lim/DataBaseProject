@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Funcionario
+from database.models import Funcionario
 from datetime import date
 
 

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Estoque
+from database.models import Estoque
 from sqlalchemy import and_
 
 

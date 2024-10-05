@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import os, uuid
-from css import css
+from styles.css import css
 from controllers.cliente import *
 from controllers.fornecedor import *
 from controllers.funcionario import *

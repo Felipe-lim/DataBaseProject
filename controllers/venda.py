@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Venda
+from database.models import Venda
 from datetime import date
 
 

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Fornecedor
+from database.models import Fornecedor
 from datetime import date
 
 def create_fornecedor(db: Session, 
