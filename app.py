@@ -1,5 +1,5 @@
 import streamlit as st
-from css import css
+from styles.css import css
 
 
 st.markdown(css, unsafe_allow_html=True)
