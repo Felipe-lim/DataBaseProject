@@ -2,7 +2,7 @@ import streamlit as st
 from database.db import get_db
 from controllers.estoque import create_estoque
 from sqlalchemy.orm import Session
-from database.models import Estoque, Catalogo
+from models import Estoque, Catalogo
 
 
 def estoque_page():

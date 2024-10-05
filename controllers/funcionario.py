@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from database.models import Funcionario
+from models import Funcionario
 from datetime import date
 import streamlit as st
 

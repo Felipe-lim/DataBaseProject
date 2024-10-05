@@ -6,7 +6,7 @@ from controllers.estoque import get_all_estoque, update_estoque_quantity
 from controllers.cliente import get_cliente
 from controllers.funcionario import get_funcionario
 from database import get_db
-from database.models import Cliente, Funcionario, Venda, Estoque
+from models import Cliente, Funcionario, Venda, Estoque
 
 
 

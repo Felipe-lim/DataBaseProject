@@ -1,8 +1,8 @@
 from psycopg2 import IntegrityError
 from sqlalchemy.orm import Session
-from database.models import Estoque
+from models import Estoque
 from sqlalchemy import and_
-from database.models import Catalogo
+from models import Catalogo
 
 
 

@@ -3,7 +3,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 from controllers.compra import create_compra, get_compra, update_compra, delete_compra, get_all_compras
 from database import get_db  
-from database.models import Compra
+from models import Compra
 
 def display_compras(db: Session):
     compras = get_all_compras(db)

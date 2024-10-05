@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from database.models import Cliente
+from models import Cliente
 from datetime import date
 import streamlit as st
 from sqlalchemy.orm import joinedload
