@@ -9,6 +9,8 @@ from controllers.general import *
 from controllers.pessoas import *
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from database.db import get_db
+
 
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -25,13 +27,6 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 def find_user_and_pessoa(db, identifier, user_type):
     user = None

@@ -1,6 +1,9 @@
+from psycopg2 import IntegrityError
 from sqlalchemy.orm import Session
 from models import Estoque
 from sqlalchemy import and_
+from models import Catalogo
+
 
 
 def create_estoque(db: Session, 
@@ -11,16 +14,32 @@ def create_estoque(db: Session,
                    custo: int,
                    preco: int):
     
+    catalogo_item = db.query(Catalogo).filter_by(especie=especie, variedade=variedade).first()
+    
+    if not catalogo_item:
+        new_catalogo_item = Catalogo(especie=especie, variedade=variedade)
+        db.add(new_catalogo_item)
+        db.commit()
+        db.refresh(new_catalogo_item)
+    
     db_estoque = Estoque(especie=especie, 
                          variedade=variedade,
                          quantidade=quantidade,
                          fornecedor=fornecedor,
                          custo=custo,
                          preco=preco)
-    db.add(db_estoque)
-    db.commit()
-    db.refresh(db_estoque)
-    return db_estoque
+    
+    try:
+        db.add(db_estoque)
+        db.commit()
+        db.refresh(db_estoque)
+        return db_estoque
+    
+    except IntegrityError:
+        db.rollback()
+        raise Exception("Erro ao cadastrar o produto no estoque. Verifique os dados e tente novamente.")
+    
+
 
 
 def get_estoque(db: Session, especie: str, variedade: str):

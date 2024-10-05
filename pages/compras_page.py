@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import date
 from sqlalchemy.orm import Session
 from controllers.compra import create_compra, get_compra, update_compra, delete_compra, get_all_compras
-from database import get_db  # Função para obter a sessão do banco de dados (deve ser implementada)
+from database import get_db  
 from models import Compra
 
 def display_compras(db: Session):

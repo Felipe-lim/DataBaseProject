@@ -59,7 +59,6 @@ def calculate_discount(endereco, time, one_piece):
     if one_piece:
         discount += 5
     return discount
-
 def create_venda(db: Session, 
                  data: date,
                  comprador_id: str,
@@ -76,9 +75,9 @@ def create_venda(db: Session,
         raise Exception("Comprador não encontrado no banco de dados")
 
     # Extrair as informações relevantes para o cálculo do desconto
-    endereco = comprador.endereco
-    time = comprador.time  # Supondo que você tenha um campo "time" na tabela Pessoa
-    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Pessoa
+    endereco = comprador.pessoa.endereco  # Acessando o endereço através de 'pessoa'
+    time = comprador.time  # Acessando o campo "time" diretamente no cliente
+    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Cliente
 
     # Calcula o desconto adicional com base nas informações do banco de dados
     desconto += calculate_discount(endereco, time, one_piece)
@@ -101,7 +100,6 @@ def create_venda(db: Session,
     db.refresh(db_venda)
     return db_venda
 
-
 def update_venda(db: Session, 
                  venda_id: int,
                  data: date = None,
@@ -123,9 +121,9 @@ def update_venda(db: Session,
         raise Exception("Comprador não encontrado no banco de dados")
 
     # Extrair as informações relevantes para o cálculo do desconto
-    endereco = comprador.endereco
-    time = comprador.time  # Supondo que você tenha um campo "time" na tabela Pessoa
-    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Pessoa
+    endereco = comprador.pessoa.endereco  # Acessando o endereço através de 'pessoa'
+    time = comprador.time  # Acessando o campo "time" diretamente no cliente
+    one_piece = comprador.one_piece  # Supondo que você tenha um campo booleano "one_piece" na tabela Cliente
 
     # Calcula o desconto adicional com base nas informações do banco de dados
     desconto += calculate_discount(endereco, time, one_piece)

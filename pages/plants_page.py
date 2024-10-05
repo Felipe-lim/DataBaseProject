@@ -1,15 +1,7 @@
 import streamlit as st
 from sqlalchemy.orm import Session
 from controllers.estoque import get_all_estoque  
-from database.db import SessionLocal  
-
- 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from database.db import SessionLocal, get_db  
 
 def plants_page():
     st.title("Plantas Cadastradas")

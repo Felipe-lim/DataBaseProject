@@ -3,65 +3,40 @@ from datetime import date
 from sqlalchemy.orm import Session
 from controllers.venda import create_venda, get_venda, update_venda, delete_venda, get_all_vendas
 from controllers.estoque import get_all_estoque, update_estoque_quantity
+from controllers.cliente import get_cliente
+from controllers.funcionario import get_funcionario
 from database import get_db
 from models import Cliente, Funcionario, Venda, Estoque
-from sqlalchemy.orm import joinedload
 
 
 
-# Função para obter o cliente pelo CPF
-def get_cliente(db: Session, cpf: str):
-    cpf_formatado = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
-    st.write(f"Buscando Cliente com CPF: {cpf_formatado}")  # Log para verificação
-
-    # Usar joinedload para carregar a relação 'pessoa' juntamente com o cliente
-    cliente = db.query(Cliente).options(joinedload(Cliente.pessoa)).filter(Cliente.cpf == cpf_formatado).first()
-
-    if cliente:
-        st.write(f"Cliente encontrado: {cliente.pessoa.nome}")  # Log para verificar se encontrou o cliente
-        return cliente
-    else:
-        st.error(f"CPF {cpf_formatado} não encontrado no banco de dados.")  # Mensagem de erro se não encontrado
-        return None
-# Função para obter o funcionário pelo CPF
-def get_funcionario(db: Session, cpf: str):
-    cpf_formatado2 = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
-    st.write(f"Buscando vendedor com CPF: {cpf_formatado2}")  # Adicione esta linha para verificar o CPF
-
-    funcionario = db.query(Funcionario).filter(Funcionario.cpf == cpf_formatado2).first()
-
-    if funcionario:
-        st.write(f"Vendedor encontrado: {funcionario.pessoa.nome}")  # Adicione esta linha para verificar se encontrou
-        return funcionario
-    else:
-        st.error(f"CPF {cpf_formatado2} não encontrado no banco de dados.")  # Verificação adicional para CPF não encontrado
-        return None
 
 # Função para aplicar desconto com base nos critérios do cliente
 def calcular_desconto(cliente: Cliente):
     desconto = 0
     if 'Sousa' in cliente.pessoa.endereco:  
-        desconto += 5
+        desconto = 5
     if cliente.time.lower() == 'flamengo':
-        desconto += 5
+        desconto = 5
     if cliente.one_piece.lower() == 'sim':
-        desconto += 5
+        desconto = 5
     return desconto
 
 
-# Função para exibir todos os produtos em estoque
+# Função para exibir todos os produtos em estoque, incluindo o preço de venda
 def display_estoque(db: Session):
     estoque = get_all_estoque(db)
     st.write("## Estoque Disponível")
     
-    # Iterando sobre o estoque e exibindo o nome do produto e sua quantidade
+    # Iterando sobre o estoque e exibindo o nome do produto, quantidade e preço
     for item in estoque:
-        nome_produto = f"{item.especie} - {item.variedade} | Quantidade: {item.quantidade}"
+        nome_produto = f"{item.especie} - {item.variedade} | Quantidade: {item.quantidade} | Preço: R$ {item.preco:.2f}"
         st.write(nome_produto)  # Exibir cada item formatado corretamente
     
     # Retornar um dicionário, se necessário, para uso posterior
     estoque_dict = {f"{item.especie} - {item.variedade}": item for item in estoque}
     return estoque_dict
+
 
 # Função para exibir todas as vendas
 def display_vendas(db: Session):

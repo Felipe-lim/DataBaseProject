@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from models import Funcionario
 from datetime import date
-
+import streamlit as st
 
 def create_funcionario(db: Session, 
                        pessoa_id: str, 
@@ -24,9 +24,18 @@ def create_funcionario(db: Session,
     db.refresh(db_funcionario)
     return db_funcionario
 
-
 def get_funcionario(db: Session, cpf: str):
-    return db.query(Funcionario).filter(Funcionario.cpf == cpf).first()
+    cpf_formatado2 = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
+    st.write(f"Buscando vendedor com CPF: {cpf_formatado2}")  # Adicione esta linha para verificar o CPF
+
+    funcionario = db.query(Funcionario).filter(Funcionario.cpf == cpf_formatado2).first()
+
+    if funcionario:
+        st.write(f"Vendedor encontrado: {funcionario.pessoa.nome}")  # Adicione esta linha para verificar se encontrou
+        return funcionario
+    else:
+        st.error(f"CPF {cpf_formatado2} não encontrado no banco de dados.")  # Verificação adicional para CPF não encontrado
+        return None
 
 
 def update_funcionario(db: Session, 
