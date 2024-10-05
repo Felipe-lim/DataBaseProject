@@ -4,14 +4,18 @@ from sqlalchemy.orm import Session
 from controllers.venda import create_venda, get_venda, update_venda, delete_venda, get_all_vendas
 from controllers.estoque import get_all_estoque, update_estoque_quantity
 from database import get_db
-from models import Cliente, Funcionario, Venda
+from models import Cliente, Funcionario, Venda, Estoque
+from sqlalchemy.orm import joinedload
+
+
 
 # Função para obter o cliente pelo CPF
 def get_cliente(db: Session, cpf: str):
     cpf_formatado = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
     st.write(f"Buscando Cliente com CPF: {cpf_formatado}")  # Log para verificação
 
-    cliente = db.query(Cliente).filter(Cliente.cpf == cpf_formatado).first()
+    # Usar joinedload para carregar a relação 'pessoa' juntamente com o cliente
+    cliente = db.query(Cliente).options(joinedload(Cliente.pessoa)).filter(Cliente.cpf == cpf_formatado).first()
 
     if cliente:
         st.write(f"Cliente encontrado: {cliente.pessoa.nome}")  # Log para verificar se encontrou o cliente
@@ -19,8 +23,6 @@ def get_cliente(db: Session, cpf: str):
     else:
         st.error(f"CPF {cpf_formatado} não encontrado no banco de dados.")  # Mensagem de erro se não encontrado
         return None
-
-
 # Função para obter o funcionário pelo CPF
 def get_funcionario(db: Session, cpf: str):
     cpf_formatado2 = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
@@ -38,13 +40,14 @@ def get_funcionario(db: Session, cpf: str):
 # Função para aplicar desconto com base nos critérios do cliente
 def calcular_desconto(cliente: Cliente):
     desconto = 0
-    if 'Sousa' in cliente.pessoa.endereco:
+    if 'Sousa' in cliente.pessoa.endereco:  
         desconto += 5
     if cliente.time.lower() == 'flamengo':
         desconto += 5
     if cliente.one_piece.lower() == 'sim':
         desconto += 5
     return desconto
+
 
 # Função para exibir todos os produtos em estoque
 def display_estoque(db: Session):
@@ -85,12 +88,14 @@ def adicionar_venda(db: Session):
     # Buscar o cliente com base no CPF
     cliente = get_cliente(db, comprador_cpf)
     
-    # Se o cliente não for encontrado, pare o processo
-    if not cliente:
-        st.error("Comprador não encontrado. Verifique o CPF e tente novamente.")
-        return  # Interrompe o fluxo aqui
+    # Verificar o que está retornando da função get_cliente
+    st.write(f"Resultado da busca do cliente: {cliente}")
     
-    # Exibir estoque e permitir adicionar itens ao carrinho
+    # Teste para verificar se o relacionamento com pessoa está funcionando
+    if cliente:
+        st.write(f"Endereço do cliente: {cliente.pessoa.endereco}")  # Teste explícito para ver se está acessando o endereço
+    else:
+        st.error("Cliente não encontrado!")    # Exibir estoque e permitir adicionar itens ao carrinho
     estoque_dict = display_estoque(db)
     carrinho = []
 

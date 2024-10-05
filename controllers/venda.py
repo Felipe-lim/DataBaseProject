@@ -2,6 +2,38 @@ from sqlalchemy.orm import Session
 from models import Venda
 from datetime import date
 from controllers.pessoas import get_pessoa 
+import streamlit as st
+from models import Cliente, Funcionario
+
+# Função para obter o cliente pelo CPF
+def get_cliente(db: Session, cpf: str):
+    cpf_formatado = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
+    st.write(f"Buscando Cliente com CPF: {cpf_formatado}")  # Log para verificação
+
+    cliente = db.query(Cliente).filter(Cliente.cpf == cpf_formatado).first()
+
+    if cliente:
+        st.write(f"Cliente encontrado: {cliente.pessoa.nome}")  # Log para verificar se encontrou o cliente
+        return cliente
+    else:
+        st.error(f"CPF {cpf_formatado} não encontrado no banco de dados.")  # Mensagem de erro se não encontrado
+        return None
+
+
+# Função para obter o funcionário pelo CPF
+def get_funcionario(db: Session, cpf: str):
+    cpf_formatado2 = cpf.replace('.', '').replace('-', '')  # Remover a formatação do CPF
+    st.write(f"Buscando vendedor com CPF: {cpf_formatado2}")  # Adicione esta linha para verificar o CPF
+
+    funcionario = db.query(Funcionario).filter(Funcionario.cpf == cpf_formatado2).first()
+
+    if funcionario:
+        st.write(f"Vendedor encontrado: {funcionario.pessoa.nome}")  # Adicione esta linha para verificar se encontrou
+        return funcionario
+    else:
+        st.error(f"CPF {cpf_formatado2} não encontrado no banco de dados.")  # Verificação adicional para CPF não encontrado
+        return None
+
 
 
 def get_venda(db: Session, venda_id: int):
@@ -39,7 +71,7 @@ def create_venda(db: Session,
                  status_pagamento: str):
     
     # Buscar as informações do comprador no banco de dados
-    comprador = get_pessoa(db, comprador_id)
+    comprador = get_cliente(db, comprador_id)
     if not comprador:
         raise Exception("Comprador não encontrado no banco de dados")
 
@@ -86,7 +118,7 @@ def update_venda(db: Session,
         raise Exception("Venda não encontrada no banco de dados")
 
     # Buscar as informações do comprador no banco de dados
-    comprador = get_pessoa(db, comprador_id)
+    comprador = get_cliente(db, comprador_id)
     if not comprador:
         raise Exception("Comprador não encontrado no banco de dados")
 
