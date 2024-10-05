@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean, PrimaryKeyConstraint, ForeignKeyConstraint
 from sqlalchemy.orm import relationship
-from db import Base
+from database.db import Base
 
 class Pessoa(Base):
     __tablename__ = "pessoas"
