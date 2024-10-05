@@ -66,3 +66,18 @@ def delete_estoque(db: Session, especie: str, variedade: str):
 
 def get_all_estoque(db: Session):
     return db.query(Estoque).all()
+
+def update_estoque_quantity(db: Session, especie: str, variedade: str, nova_quantidade: int):
+    # Obtém o estoque com base na espécie e variedade
+    db_estoque = get_estoque(db, especie, variedade)
+    
+    # Verifica se o estoque existe
+    if db_estoque:
+        # Atualiza a quantidade
+        db_estoque.quantidade = nova_quantidade
+        
+        # Salva as alterações no banco de dados
+        db.commit()
+        db.refresh(db_estoque)
+        
+    return db_estoque
