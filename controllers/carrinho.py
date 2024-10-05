@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Carrinho
+from database.models import Carrinho
 
 
 def create_carrinho(db: Session,

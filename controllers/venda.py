@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
-from models import Venda
+from database.models import Venda
 from datetime import date
 from controllers.pessoas import get_pessoa 
 import streamlit as st
-from models import Cliente, Funcionario
+from database.models import Cliente, Funcionario
 
 # Função para obter o cliente pelo CPF
 def get_cliente(db: Session, cpf: str):

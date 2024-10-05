@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Pessoa
+from database.models import Pessoa
 from datetime import date
 
 def create_pessoa(db: Session,

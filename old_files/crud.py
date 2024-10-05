@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Pessoa, Fornecedor, Cliente, Funcionario
+from database.models import Pessoa, Fornecedor, Cliente, Funcionario
 from datetime import date
 
 # * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

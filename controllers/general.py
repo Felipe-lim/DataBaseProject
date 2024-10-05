@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from models import Pessoa, Fornecedor, Cliente, Funcionario
+from database.models import Pessoa, Fornecedor, Cliente, Funcionario
 
 # Função para pegar todas as informações de todas as pessoas com o join das tabelas relacionadas
 def get_all_pessoas(db: Session):
