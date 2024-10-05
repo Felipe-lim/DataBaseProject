@@ -7,7 +7,7 @@ def home():
         '<h1>Bem-vindo ao CLOROFILA TECH</h1>',
         unsafe_allow_html=True,
     )
-    st.write("Somos um sistema de gerenciamento de ervas finas")
+    st.write("Somos um sistema de gerenciamento de floriculturas.")
     st.write("Use a barra lateral para navegar")
 
 home()

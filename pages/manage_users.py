@@ -112,11 +112,18 @@ def buscar_valor(opcoes, valor):
         return 0
 
 page = "Manage Users"
-if page == "Manage Users":
-    st.markdown('<h1 class="gradient-text">Gerenciar Usuários</h1>', unsafe_allow_html=True)
 
-    user_type = st.sidebar.radio("Escolha o tipo de usuário", ["Cliente", "Fornecedor", "Funcionário"])
-    operation = st.sidebar.selectbox("Escolha sua operação", ["Create", "Read", "Update", "Delete"])
+if page == "Manage Users":
+    st.markdown(
+        '<h1 class="gradient-text">Gerenciar Usuários</h1>', unsafe_allow_html=True
+    )
+
+    operation = st.selectbox(
+        "Escolha sua operação", ["Create", "Read", "Update", "Delete"]
+    )
+    user_type = st.radio(
+        "Escolha o tipo de usuário", ["Cliente", "Fornecedor", "Funcionário"]
+    )
 
     if operation == "Create":
         st.subheader("Adicionar um novo usuário")
@@ -171,20 +178,34 @@ if page == "Manage Users":
                 db = next(get_db())
                 try:
                     user_id = str(uuid.uuid4())
-                    pessoa = create_pessoa(db, user_id, nome, endereco, email, telefone, cep)
+                    pessoa = create_pessoa(
+                        db, user_id, nome, endereco, email, telefone, cep
+                    )
                     if user_type == "Cliente":
                         create_cliente(db, pessoa.id, cpf, time, one_piece)
                     elif user_type == "Fornecedor":
                         create_fornecedor(db, pessoa.id, cnpj, setor)
                     elif user_type == "Funcionário":
-                        create_funcionario(db, pessoa.id, cpf, cargo, genero, nascimento, naturalidade, salario)
+                        create_funcionario(
+                            db,
+                            pessoa.id,
+                            cpf,
+                            cargo,
+                            genero,
+                            nascimento,
+                            naturalidade,
+                            salario,
+                        )
                     st.success(f"Usuário '{nome}' criado com sucesso! ID: {user_id}")
                 except Exception as e:
                     st.error(f"Erro ao criar usuário: {str(e)}")
 
     elif operation == "Read":
         st.subheader("Ler informações de um usuário")
-        read_option = st.radio("Escolha uma opção", ["Buscar usuário específico", "Listar todas as pessoas"])
+        read_option = st.radio(
+            "Escolha uma opção",
+            ["Buscar usuário específico", "Listar todas as pessoas"],
+        )
 
         if read_option == "Buscar usuário específico":
             identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
@@ -193,51 +214,62 @@ if page == "Manage Users":
                     db = next(get_db())
                     try:
                         user, pessoa = find_user_and_pessoa(db, identifier, user_type)
+
                         if user and pessoa:
                             data = {
-                                "ID": str(pessoa.id),
-                                "Nome": pessoa.nome,
-                                "Endereço": pessoa.endereco,
-                                "Email": pessoa.email,
-                                "Telefone": pessoa.telefone,
-                                "CEP": pessoa.cep,
+                                "ID": [pessoa.id],
+                                "Nome": [pessoa.nome],
+                                "Endereço": [pessoa.endereco],
+                                "Email": [pessoa.email],
+                                "Telefone": [pessoa.telefone],
+                                "CEP": [pessoa.cep],
                             }
                             for k, v in user.__dict__.items():
                                 if not k.startswith("_"):
-                                    data[k] = str(v)
-                            st.write("Informações do usuário:")
-                            st.write(data)
+                                    data[k] = [v]
+                            df = pd.DataFrame(data)
+                            st.table(df)
                         else:
                             st.warning("Usuário não encontrado.")
                     except Exception as e:
                         st.error(f"Erro ao buscar usuário: {str(e)}")
 
         elif read_option == "Listar todas as pessoas":
-            db = next(get_db())
+            db = next(get_db())  # Obtenção da sessão de banco de dados
             try:
-                pessoas = get_all_pessoas(db)
+                pessoas = get_all_pessoas(db)  # Chama a função que faz o join
                 if pessoas:
-                    data = [
-                        {
-                            "ID": str(p.id),
-                            "Nome": p.nome,
-                            "Endereço": p.endereco,
-                            "Email": p.email,
-                            "Telefone": p.telefone,
-                            "CEP": p.cep,
+                    # Formata os dados para o DataFrame incluindo informações adicionais (cliente, fornecedor, funcionário)
+                    data = []
+                    for p in pessoas:
+                        pessoa_info = {
+                            "ID": p['id'],
+                            "Nome": p['nome'],
+                            "Endereço": p['endereco'],
+                            "Email": p['email'],
+                            "Telefone": p['telefone'],
+                            "CEP": p['cep'],
+                            "Cliente CPF": p['cliente']['cpf'] if p['cliente'] else None,
+                            "Time Cliente": p['cliente']['time'] if p['cliente'] else None,
+                            "Fornecedor CNPJ": p['fornecedor']['cnpj'] if p['fornecedor'] else None,
+                            "Setor Fornecedor": p['fornecedor']['setor'] if p['fornecedor'] else None,
+                            "Funcionário CPF": p['funcionario']['cpf'] if p['funcionario'] else None,
+                            "Cargo Funcionário": p['funcionario']['cargo'] if p['funcionario'] else None,
+                            "Salário Funcionário": p['funcionario']['salario'] if p['funcionario'] else None,
                         }
-                        for p in pessoas
-                    ]
+                        data.append(pessoa_info)
+
+                    # Cria o DataFrame com as informações
                     df = pd.DataFrame(data)
-                    df = df.astype(str)
-                    st.table(df)
+                    st.table(df)  # Exibe a tabela no Streamlit
                 else:
                     st.warning("Nenhuma pessoa encontrada.")
             except Exception as e:
                 st.error(f"Erro ao listar pessoas: {str(e)}")
-
+                
     elif operation == "Update":
         st.subheader("Atualizar informações de um usuário")
+        
         identifier = st.text_input("CPF ou CNPJ do usuário")
         
         user_found = False
@@ -246,9 +278,11 @@ if page == "Manage Users":
             if validate_input({"Identificador": identifier}):
                 try:
                     user, pessoa = find_user_and_pessoa(db, identifier, user_type)
+                    
                     if user and pessoa:
                         user_found = True
                         st.success("Usuário encontrado! Preencha os campos abaixo para atualizar.")
+                        
                         st.session_state["user"] = user
                         st.session_state["pessoa"] = pessoa
                     else:
@@ -268,23 +302,40 @@ if page == "Manage Users":
                 cep = st.text_input("CEP", value=pessoa.cep)
 
                 if user_type == "Cliente":
-                    cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
-                    cpf_novo = st.text_input("CPF Novo", value=user.cpf)
-                    time = st.text_input("Time", value=user.time)
-                    one_piece = st.selectbox("One Piece:", ['', 'Assiste', 'Não assiste'], index=buscar_valor(['', 'Assiste', 'Não assiste'], user.one_piece))
+                    try:
+                        cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
+                        cpf_novo = st.text_input("CPF Novo", value=user.cpf)
+                        time = st.text_input("Time", value=user.time)
+                        one_piece = st.selectbox("One Piece:", ['','Assiste', 'Não assiste'], index=buscar_valor(['','Assiste', 'Não assiste'], user.one_piece))
+                    except:
+                        pass
                 elif user_type == "Fornecedor":
-                    cnpj_atual = st.text_input("CNPJ Atual", value=user.cnpj, disabled=True)
-                    cnpj_novo = st.text_input("CNPJ Novo", value=user.cnpj)
-                    setor = st.text_input("Setor", value=user.setor)
+                    try:
+                        cnpj_atual = st.text_input("CNPJ Atual", value=user.cnpj,disabled=True)
+                        cnpj_novo = st.text_input("CNPJ Novo", value=user.cnpj)
+                        setor = st.text_input("Setor", value=user.setor)
+                    except:  
+                        pass
                 elif user_type == "Funcionário":
-                    cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
-                    cpf_novo = st.text_input("CPF Novo", value=user.cpf)
-                    cargo = st.text_input("Cargo", value=user.cargo)
-                    genero = st.selectbox("Gênero", ["Masculino", "Feminino", "Outro"], index=["Masculino", "Feminino", "Outro"].index(user.genero))
-                    nascimento = st.date_input("Data de Nascimento", value=user.nascimento)
-                    naturalidade = st.text_input("Naturalidade", value=user.naturalidade)
-                    salario = st.number_input("Salário", value=user.salario, min_value=0, step=100)
-
+                    try:
+                        cpf_atual = st.text_input("CPF Atual", value=user.cpf, disabled=True)
+                        cpf_novo = st.text_input("CPF Novo", value=user.cpf)
+                        cargo = st.text_input("Cargo", value=user.cargo)
+                        genero = st.selectbox(
+                            "Gênero", ["Masculino", "Feminino", "Outro"],
+                            index=["Masculino", "Feminino", "Outro"].index(user.genero)
+                        )
+                        nascimento = st.date_input(
+                            "Data de Nascimento", value=user.nascimento
+                        )
+                        naturalidade = st.text_input(
+                            "Naturalidade", value=user.naturalidade
+                        )
+                        salario = st.number_input(
+                            "Salário", value=user.salario, min_value=0, step=100
+                        )
+                    except:
+                        pass
                 submit_button = st.form_submit_button(label="Atualizar")
 
             if submit_button:
@@ -295,85 +346,62 @@ if page == "Manage Users":
                     "Telefone": telefone,
                     "CEP": cep,
                 }
-                if user_type == "Cliente":
-                    fields["CPF Atual"] = cpf_atual
-                    fields["CPF Novo"] = cpf_novo
-                    fields["Time"] = time
-                    fields["One Piece"] = one_piece
-                elif user_type == "Fornecedor":
-                    fields["CNPJ Atual"] = cnpj_atual
-                    fields["CNPJ Novo"] = cnpj_novo
-                    fields["Setor"] = setor
-                elif user_type == "Funcionário":
-                    fields["CPF Atual"] = cpf_atual
-                    fields["CPF Novo"] = cpf_novo
-                    fields["Cargo"] = cargo
-                    fields["Gênero"] = genero
-                    fields["Data de Nascimento"] = nascimento
-                    fields["Naturalidade"] = naturalidade
-                    fields["Salário"] = salario
-
+                try:
+                    if user_type == "Cliente":
+                        fields["CPF Atual"] = cpf_atual
+                        fields["CPF Novo"] = cpf_novo
+                        fields["Time"] = time
+                        fields["One Piece"] = one_piece
+                    elif user_type == "Fornecedor":
+                        fields["CNPJ Atual"] = cnpj_atual
+                        fields["CNPJ Novo"] = cnpj_novo
+                        fields["Setor"] = setor
+                    elif user_type == "Funcionário":
+                        fields["CPF Atual"] = cpf_atual
+                        fields["CPF Novo"] = cpf_novo
+                        fields["Cargo"] = cargo
+                        fields["Gênero"] = genero
+                        fields["Data de Nascimento"] = nascimento
+                        fields["Naturalidade"] = naturalidade
+                        fields["Salário"] = salario
+                except:
+                    pass
                 if validate_input(fields):
                     try:
-                        # Atualiza as informações
                         update_pessoa(db, pessoa.id, nome, endereco, email, telefone, cep)
-
+                        
                         if user_type == "Cliente":
-                            update_cliente(db, user.id, cpf_novo, time, one_piece)
+                            update_cliente(db,cpf_atual, cpf_novo, time, one_piece)
                         elif user_type == "Fornecedor":
-                            update_fornecedor(db, user.id, cnpj_novo, setor)
+                            update_fornecedor(db, cnpj_atual, cnpj_novo , setor)
                         elif user_type == "Funcionário":
-                            update_funcionario(db, user.id, cpf_novo, cargo, genero, nascimento, naturalidade, salario)
-                            
-                        st.success("Usuário atualizado com sucesso!")
-                        del st.session_state["user"]
-                        del st.session_state["pessoa"]
+                            update_funcionario(db, user.pessoa_id, cpf_atual,cpf_novo, cargo, genero, nascimento, naturalidade, salario)
+                        
+                        st.success(f"Usuário '{nome}' atualizado com sucesso!")
                     except Exception as e:
                         st.error(f"Erro ao atualizar usuário: {str(e)}")
+                else:
+                    st.warning("Por favor, preencha todos os campos corretamente.") 
 
     elif operation == "Delete":
         st.subheader("Deletar um usuário")
         identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
-
-        if st.button("Buscar Usuário"):
+        if st.button("Deletar"):
             if validate_input({"Identificador": identifier}):
                 db = next(get_db())
                 try:
-                    # Buscar o usuário e a pessoa relacionada
                     user, pessoa = find_user_and_pessoa(db, identifier, user_type)
 
                     if user and pessoa:
-                        st.write("Usuário encontrado:")
-                        data = {
-                            "ID": str(pessoa.id),
-                            "Nome": pessoa.nome,
-                            "Endereço": pessoa.endereco,
-                            "Email": pessoa.email,
-                            "Telefone": pessoa.telefone,
-                            "CEP": pessoa.cep,
-                        }
-                        st.write(data)
-
-                        # Armazenar user e pessoa no st.session_state
-                        st.session_state['user_to_delete'] = user
-                        st.session_state['pessoa_to_delete'] = pessoa
-
+                        delete_pessoa(db, pessoa.id)
+                        if user_type == "Cliente":
+                            delete_cliente(db, user.cpf)
+                        elif user_type == "Fornecedor":
+                            delete_fornecedor(db, user.cnpj)
+                        elif user_type == "Funcionário":
+                            delete_funcionario(db, user.cpf)
+                        st.success(f"Usuário '{pessoa.nome}' deletado com sucesso!")
                     else:
                         st.warning("Usuário não encontrado.")
                 except Exception as e:
-                    st.error(f"Erro ao buscar usuário: {str(e)}")
-
-        # Verificar se user e pessoa estão no session_state
-        if 'user_to_delete' in st.session_state and 'pessoa_to_delete' in st.session_state:
-            if st.button("Confirmar Deleção"):
-                db = next(get_db())
-                user = st.session_state['user_to_delete']
-                pessoa = st.session_state['pessoa_to_delete']
-                success, message = delete_user(db, pessoa.id, user_type)
-                if success:
-                    st.success(message)
-                    # Remover user e pessoa do session_state após a deleção
-                    del st.session_state['user_to_delete']
-                    del st.session_state['pessoa_to_delete']
-                else:
-                    st.error(message)
+                    st.error(f"Erro ao deletar usuário: {str(e)}")
