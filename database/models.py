@@ -24,8 +24,7 @@ class Fornecedor(Base):
     setor = Column(String)
     
     pessoa = relationship("Pessoa", back_populates="fornecedor")
-    compras = relationship("Compra", back_populates="fornecedor")
-    estoque = relationship("Estoque", back_populates="fornecedor")
+    compras = relationship("Compra", back_populates="fornecedor")  # Corrigido para plural
 
 class Cliente(Base):
     __tablename__ = "clientes"
@@ -77,16 +76,15 @@ class Estoque(Base):
     especie = Column(String)
     variedade = Column(String)
     quantidade = Column(Integer)
-    fornecedor_cnpj = Column(String, ForeignKey("fornecedores.cnpj"))
+    fornecedor = Column(String)
     custo = Column(Integer)
     preco = Column(Integer)
 
     __table_args__ = (
-        PrimaryKeyConstraint('especie', 'variedade'),
+        PrimaryKeyConstraint('especie', 'variedade', 'fornecedor', 'custo'),
         ForeignKeyConstraint(['especie', 'variedade'], ['catalogo.especie', 'catalogo.variedade']),
     )
 
-    fornecedor = relationship("Fornecedor", back_populates="estoque")
     catalogo = relationship("Catalogo", back_populates="estoque", uselist=False)  # Corrigido para False
     carrinho = relationship("Carrinho", back_populates="estoque")  # Adicionado para definir o relacionamento inverso
 
@@ -114,14 +112,17 @@ class Carrinho(Base):
     id_venda = Column(Integer, ForeignKey("vendas.id"))
     especie = Column(String)
     variedade = Column(String)
+    fornecedor = Column(String)  # Add fornecedor to match the primary key of Estoque
+    custo = Column(Integer)      # Add custo to match the primary key of Estoque
     quantidade = Column(Integer)
 
     __table_args__ = (
-        ForeignKeyConstraint(['especie', 'variedade'], ['estoque.especie', 'estoque.variedade']),
+        ForeignKeyConstraint(['especie', 'variedade', 'fornecedor', 'custo'], ['estoque.especie', 'estoque.variedade', 'estoque.fornecedor', 'estoque.custo']),
     )
 
     estoque = relationship("Estoque", back_populates="carrinho")
     venda = relationship("Venda", back_populates="carrinho")
+
     
 class Compra(Base):
     __tablename__ = "compras"

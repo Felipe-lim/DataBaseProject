@@ -1,11 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from database.models import Catalogo
-from datetime import date
-
-
-from sqlalchemy.orm import Session
-from database.models import Catalogo
 
 def create_catalogo(db: Session, 
                            especie: str, 

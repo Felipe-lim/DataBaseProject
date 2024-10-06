@@ -1,7 +1,4 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import MetaData
-from database.models import Base
-from database.db import engine
+from database.db import engine, Base
 
 def drop_all_tables(engine):
     try:
