@@ -29,12 +29,17 @@ def estoque_page():
             db = next(get_db())  # Conexão com o banco de dados
 
             try:
-                #create_catalogo(db, especie, variedade)
-                create_estoque(db, especie, variedade, quantidade, fornecedor_cnpj, custo, preco)
-                #create_compra(db, data, fornecedor_cnpj, quantidade, especie, variedade, custo, forma_pagamento)
+                estoque = create_estoque(db, especie, variedade, quantidade, fornecedor_cnpj, custo, preco)
                 st.success("Produto cadastrado com sucesso!")
             except Exception as e:
-                st.error(f"Erro ao cadastrar produto: {str(e)}")
+                st.error(f"Erro ao cadastrar no estoque: {str(e)}")
+
+            if estoque:
+                try:
+                    create_compra(db, data, fornecedor_cnpj, quantidade, especie, variedade, custo, forma_pagamento)
+                except Exception as e:
+                    st.error(f"Erro ao cadastrar compra: {str(e)}")
+
         else:
             st.warning("Por favor, preencha todos os campos obrigatórios.")
 
