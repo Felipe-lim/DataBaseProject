@@ -7,7 +7,7 @@ from controllers.estoque import *
 from controllers.catalogo import *
 
 
-def estoque_page():
+def display_compras():
     st.title("Cadastro de Produtos no Estoque")
     
     with st.form(key="form_produto"):
@@ -42,5 +42,3 @@ def estoque_page():
 
         else:
             st.warning("Por favor, preencha todos os campos obrigatórios.")
-
-estoque_page()

@@ -2,6 +2,7 @@ import streamlit as st
 from pags.Start.start import display_start
 from pags.Manage.manager import display_manager
 from pags.reports.report import display_report
+from pags.orders.Compra import display_compras
 
 
 def display_pages():
@@ -16,7 +17,7 @@ def display_pages():
       case "Relatórios":
          display_report()
       case "Orders":
-         display_orders()
+         display_compras()
 
 def main():
    display_pages()
