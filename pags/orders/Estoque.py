@@ -26,6 +26,3 @@ def show_estoque():
             st.write("---")
     else:
         st.write("Nenhum produto disponível no estoque.")
-
-
-show_estoque()

@@ -18,7 +18,7 @@ def display_compras():
         quantidade = st.number_input("Quantidade", min_value=1, step=1)
         custo = st.number_input("Custo Unitário(em real)", min_value=0, step=100)
         preco = st.number_input("Preço Revenda(em real)", min_value=0, step=100)
-        forma_pagamento = st.selectbox("Forma de Pagamento", ["Dinheiro", "Cartão", "Boleto", "Pix"])
+        forma_pagamento = st.selectbox("Forma de Pagamento", ["Dinheiro", "Cartão", "Boleto", "Pix", "Berries"])
 
         submit_button = st.form_submit_button(label="Cadastrar Produto")
     
