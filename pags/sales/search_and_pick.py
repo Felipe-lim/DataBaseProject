@@ -7,6 +7,7 @@ from controllers.pessoas import *
 from controllers.estoque import *
 from pags.sales.sales_aux import *
 from database.models import Estoque
+from sqlalchemy import desc
 import pandas as pd
 from pags.sales.verify_discount import verify_discount
 from time import sleep
@@ -25,7 +26,7 @@ def search_and_pick():
         if search_plant:
             # Se os valores de espécie e variedade estiverem preenchidos, faça a busca no banco de dados
             if especie and variedade:
-                result = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(Estoque.quantidade).all()
+                result = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(desc(Estoque.quantidade)).all()
                 if result:
                     st.success('Plantas encontradas')
 
@@ -64,7 +65,7 @@ def search_and_pick():
 
         if add_plant_button:
             # Adiciona no carrinho
-            plant_on_estoque = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(Estoque.quantidade).first()
+            plant_on_estoque = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(desc(Estoque.quantidade)).first()
             q_plant_available = plant_on_estoque.quantidade
             
             if q_plant_available >= quantidade:
@@ -142,10 +143,11 @@ def search_and_pick():
                                             status_pagamento="Aprovado")
                 
                 carrinho = db.query(Carrinho).filter(Carrinho.id_venda == st.session_state['user_data']['id_venda']).all()
-                for i, plant in enumerate(st.session_state['selected_plants']):
-                    item = carrinho[i]
-                    new_q = item.quantidade - plant['quantidade']
-                    update_estoque(db=db, especie_atual=item.especie, variedade_atual=item.variedade, fornecedor_atual=item.fornecedor, custo_atual=item.custo, quantidade=new_q)
+                for item in carrinho:
+                    stock_item = get_estoque(db, item.especie, item.variedade, item.fornecedor, item.custo)
+                    stock_quantity = stock_item.quantidade
+                    new_quantity = stock_quantity - item.quantidade
+                    update_estoque(db=db, especie_atual=item.especie, variedade_atual=item.variedade, fornecedor_atual=item.fornecedor, custo_atual=item.custo, quantidade=new_quantity)
                 
                 if venda_updated:
                     st.success("Pagamento confirmado com sucesso!")

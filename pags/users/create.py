@@ -6,6 +6,8 @@ from controllers.fornecedor import *
 from controllers.funcionario import *
 from controllers.general import *
 from controllers.pessoas import *
+from datetime import datetime
+
 
 def display_create(user_type):
    st.subheader("Adicionar um novo usuário")
@@ -27,7 +29,8 @@ def display_create(user_type):
             cpf = st.text_input("CPF")
             cargo = st.text_input("Cargo")
             genero = st.selectbox("Gênero", ["", "Masculino", "Feminino", "Outro"])
-            nascimento = st.date_input("Data de Nascimento", min_value="1913-01-01")
+            min_value = datetime.strptime("1913-01-01", "%Y-%m-%d").date()
+            nascimento = st.date_input("Data de Nascimento", min_value, min_value=min_value)
             naturalidade = st.text_input("Naturalidade")
             salario = st.number_input("Salário", min_value=0, step=100)
 
