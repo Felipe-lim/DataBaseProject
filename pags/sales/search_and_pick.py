@@ -106,10 +106,13 @@ def search_and_pick():
         st.write('')
         st.write('')
         discount = verify_discount(st.session_state['user_data']['cliente'])
+        
         if discount:
             final_price = price * 0.9
             discount = price * 0.1
             st.write('Desconto de 10% adicionado:')
+        else:
+            final_price = price
 
         st.markdown(f'### Preço Final R$ {final_price}')
         st.write('')
