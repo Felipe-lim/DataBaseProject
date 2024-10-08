@@ -22,10 +22,9 @@ def display_compras():
 
         submit_button = st.form_submit_button(label="Cadastrar Produto")
     
-    inputs = [data, fornecedor_cnpj, especie, variedade, quantidade, custo, preco, forma_pagamento]
 
     if submit_button:
-        if all(input is not None for input in inputs):
+        try:
             db = next(get_db())  # Conexão com o banco de dados
 
             try:
@@ -40,5 +39,5 @@ def display_compras():
                 except Exception as e:
                     st.error(f"Erro ao cadastrar compra: {str(e)}")
 
-        else:
-            st.warning("Por favor, preencha todos os campos obrigatórios.")
+        except:
+            st.warning(f"Por favor, preencha todos os campos obrigatórios:")

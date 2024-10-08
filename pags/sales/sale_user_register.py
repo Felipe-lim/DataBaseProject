@@ -17,10 +17,10 @@ def user_register():
         funcionario = st.text_input("CPF do funcionário")
         confirm_user_button = st.form_submit_button(label="Confirmar usuário")
 
-    inputs = [data, funcionario, cliente]
 
     if confirm_user_button:
-        if all(input is not None for input in inputs):
+
+        try:
             # Armazenar os dados no session_state para uso posterior
             venda = create_venda(db, data, cliente, funcionario, 0, 0, 0, "", "Processando")
             st.session_state['user_confirmed'] = True
@@ -30,9 +30,9 @@ def user_register():
                 'cliente': cliente,
                 'funcionario': funcionario
             }
-            
             st.success("Usuário confirmado")
-        else:
-            st.warning("Por favor, preencha todos os campos obrigatórios.")
+
+        except:
+            st.error(f"Por favor, preencha todos os campos obrigatórios.")
 
     return st.session_state['user_confirmed']

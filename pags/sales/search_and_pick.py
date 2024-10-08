@@ -26,24 +26,27 @@ def search_and_pick():
         if search_plant:
             # Se os valores de espécie e variedade estiverem preenchidos, faça a busca no banco de dados
             if especie and variedade:
-                result = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(desc(Estoque.quantidade)).all()
-                if result:
-                    st.success('Plantas encontradas')
+                try:
+                    result = db.query(Estoque).filter(Estoque.especie == especie, Estoque.variedade == variedade).order_by(desc(Estoque.quantidade)).all()
+                    if result:
+                        st.success('Plantas encontradas')
 
-                    # Salvar os resultados no session_state para manter após a interação
-                    st.session_state['plants_result'] = [
-                        {
-                            'especie': item.especie,
-                            'variedade': item.variedade,
-                            'quantidade': item.quantidade,
-                            'fornecedor': item.fornecedor,
-                            'custo': item.custo,
-                            'preco': item.preco
-                        }
-                        for item in result
-                    ]
-                else:
-                    st.error('Planta não encontrada')
+                        # Salvar os resultados no session_state para manter após a interação
+                        st.session_state['plants_result'] = [
+                            {
+                                'especie': item.especie,
+                                'variedade': item.variedade,
+                                'quantidade': item.quantidade,
+                                'fornecedor': item.fornecedor,
+                                'custo': item.custo,
+                                'preco': item.preco
+                            }
+                            for item in result
+                        ]
+                    else:
+                        st.error('Planta não encontrada')
+                except:
+                    st.error(f"Erro ao buscar a planta")
             else:
                 st.warning('Por favor, preencha todos os campos obrigatórios.')
 
