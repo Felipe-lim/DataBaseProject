@@ -1,6 +1,7 @@
 from utils import get_db, find_user_and_pessoa, get_all_pessoas, validate_input
 import streamlit as st
 import pandas as pd
+from validate import validar_cnpj, validar_cpf 
 
 def display_read(user_type):
    st.subheader("Ler informações de um usuário")
@@ -12,7 +13,8 @@ def display_read(user_type):
    if read_option == "Buscar usuário específico":
       identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
       if st.button("Obter informações"):
-            if validate_input({"Identificador": identifier}):
+            status, error = validar_cnpj(identifier) or validar_cpf(identifier)
+            if status:
                db = next(get_db())
                try:
                   user, pessoa = find_user_and_pessoa(db, identifier, user_type)
@@ -35,6 +37,8 @@ def display_read(user_type):
                         st.warning("Usuário não encontrado.")
                except Exception as e:
                   st.error(f"Erro ao buscar usuário: {str(e)}")
+            else:
+               st.error(error)
 
    elif read_option == "Listar todas as pessoas":
       db = next(get_db())

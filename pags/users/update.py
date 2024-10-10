@@ -5,6 +5,7 @@ from controllers.fornecedor import *
 from controllers.funcionario import *
 from controllers.general import *
 from controllers.pessoas import *
+from validate import validar_formulario
 
 def display_update(user_type):
    st.subheader("Atualizar informações de um usuário")
@@ -105,7 +106,11 @@ def display_update(user_type):
                   fields["Salário"] = salario
             except:
                   pass
-            if validate_input(fields):
+            
+            fields_validate = fields.copy()
+            fields_validate["user_type"] = user_type
+            status, errors = validar_formulario(fields_validate)
+            if status:
                try:
                   update_pessoa(db, pessoa.id, nome, endereco, email, telefone, cep)
                   
@@ -120,4 +125,5 @@ def display_update(user_type):
                except Exception as e:
                   st.error(f"Erro ao atualizar usuário: {str(e)}")
             else:
-               st.warning("Por favor, preencha todos os campos corretamente.") 
+               for campo, erro in errors.items():
+                  st.error(erro)

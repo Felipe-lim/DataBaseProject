@@ -4,12 +4,14 @@ from controllers.cliente import delete_cliente
 from controllers.fornecedor import delete_fornecedor
 from controllers.funcionario import delete_funcionario
 from controllers.pessoas import delete_pessoa
+from validate import validar_cnpj, validar_cpf
 
 def display_delete(user_type):
    st.subheader("Deletar um usuário")
    identifier = st.text_input("Digite o CPF ou CNPJ do usuário")
    if st.button("Deletar"):
-      if validate_input({"Identificador": identifier}):
+      status, error = validar_cnpj(identifier) or validar_cpf(identifier)
+      if status:
             db = next(get_db())
             try:
                user, pessoa = find_user_and_pessoa(db, identifier, user_type)
@@ -27,3 +29,5 @@ def display_delete(user_type):
                   st.warning("Usuário não encontrado.")
             except Exception as e:
                st.error(f"Erro ao deletar usuário: {str(e)}")
+      else:
+         st.error(error)

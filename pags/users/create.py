@@ -7,6 +7,7 @@ from controllers.funcionario import *
 from controllers.general import *
 from controllers.pessoas import *
 from datetime import datetime
+from validate import validar_formulario
 
 
 def display_create(user_type):
@@ -59,7 +60,10 @@ def display_create(user_type):
             fields["Naturalidade"] = naturalidade
             fields["Salário"] = salario
 
-      if validate_input(fields):
+      fields_validate = fields.copy()
+      fields_validate["user_type"] = user_type
+      status, errors = validar_formulario(fields_validate)
+      if status:
             db = next(get_db())
             try:
                user_id = str(uuid.uuid4())
@@ -84,3 +88,6 @@ def display_create(user_type):
                st.success(f"Usuário '{nome}' criado com sucesso! ID: {user_id}")
             except Exception as e:
                st.error(f"Erro ao criar usuário: {str(e)}")
+      else:
+         for campo, erro in errors.items():
+            st.error(erro)

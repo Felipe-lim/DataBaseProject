@@ -5,7 +5,7 @@ from styles.css import css
 from controllers.compra import *
 from controllers.estoque import *
 from controllers.catalogo import *
-
+from validate import validar_pedido
 
 def display_compras():
     st.title("Cadastro de Produtos no Estoque")
@@ -22,22 +22,37 @@ def display_compras():
 
         submit_button = st.form_submit_button(label="Cadastrar Produto")
     
-
+        fields = {
+            "data_compra": data,
+            "cnpj": fornecedor_cnpj,
+            "especie": especie,
+            "variedade": variedade,
+            "quantidade": quantidade,
+            "custo": custo,
+            "preco": preco,
+            "forma_pagamento": forma_pagamento
+        }
+    status, errors = validar_pedido(fields)
+    #print(status, errors)
     if submit_button:
-        try:
+        if status:
+         try:
             db = next(get_db())  # Conexão com o banco de dados
 
             try:
-                estoque = create_estoque(db, especie, variedade, quantidade, fornecedor_cnpj, custo, preco)
-                st.success("Produto cadastrado com sucesso!")
+               estoque = create_estoque(db, especie, variedade, quantidade, fornecedor_cnpj, custo, preco)
+               st.success("Produto cadastrado com sucesso!")
             except Exception as e:
-                st.error(f"Erro ao cadastrar no estoque: {str(e)}")
+               st.error(f"Erro ao cadastrar no estoque: {str(e)}")
 
             if estoque:
-                try:
-                    create_compra(db, data, fornecedor_cnpj, quantidade, especie, variedade, custo, forma_pagamento)
-                except Exception as e:
-                    st.error(f"Erro ao cadastrar compra: {str(e)}")
+               try:
+                  create_compra(db, data, fornecedor_cnpj, quantidade, especie, variedade, custo, forma_pagamento)
+               except Exception as e:
+                  st.error(f"Erro ao cadastrar compra: {str(e)}")
 
-        except:
+         except:
             st.warning(f"Por favor, preencha todos os campos obrigatórios:")
+        else:
+            for campo, erro in errors.items():
+               st.error(erro)
