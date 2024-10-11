@@ -106,6 +106,7 @@ def validar_cnpj(cnpj):
    return True, "CNPJ válido"
 
 def validar_data_nascimento(data_nascimento):
+   print(data_nascimento)
    if not data_nascimento:
       return False, "Data de nascimento é obrigatória."
    if not isinstance(data_nascimento, date):
@@ -168,7 +169,7 @@ def validar_forma_pagamento(opcao):
     return True, ""
 
 def normalizar_chave(chave):
-    return chave.lower().replace('ç', 'c').replace('ã', 'a').replace('é', 'e').replace(' ', '_')
+    return chave.lower().replace('ç', 'c').replace('ã', 'a').replace('é', 'e').replace(' ', '_').replace("á", "a").replace("ê","e")
 
 def validar_formulario(dados):
     dados_normalizados = {normalizar_chave(k): v for k, v in dados.items()}
@@ -197,7 +198,7 @@ def validar_formulario(dados):
             'cpf': validar_cpf,
             'cargo': lambda x: validar_texto(x, "Cargo"),
             'genero': validar_genero,
-            'nascimento': validar_data_nascimento,
+            'data_nascimento': validar_data_nascimento,
             'naturalidade': lambda x: validar_nome(x),
             'salario': validar_salario
         })
@@ -238,9 +239,9 @@ def validar_venda(dados):
     dados_normalizados = {normalizar_chave(k): v for k, v in dados.items()}
     
     validacoes = {
-        'data_compra': validar_data,
-        'cpf': validar_cpf,
-        'cnpj': validar_cnpj, 
+        'data': validar_data,
+        'cliente': validar_cpf,
+        'funcionario': validar_cpf, 
     }
     
     erros = {}

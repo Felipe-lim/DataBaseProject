@@ -38,10 +38,11 @@ def user_register():
                 'funcionario': funcionario
             }
             st.success("Usuário confirmado")
-            return st.session_state['user_confirmed']
 
          except:
             st.error(f"Por favor, preencha todos os campos obrigatórios.")
       else:
          for campo, erro in errors.items():
             st.error(erro)
+   return st.session_state['user_confirmed']
+      

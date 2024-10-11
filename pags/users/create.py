@@ -30,7 +30,7 @@ def display_create(user_type):
             cpf = st.text_input("CPF")
             cargo = st.text_input("Cargo")
             genero = st.selectbox("Gênero", ["", "Masculino", "Feminino", "Outro"])
-            min_value = datetime.strptime("1913-01-01", "%Y-%m-%d").date()
+            min_value = datetime.strptime("01-01-1900", "%d-%m-%Y").date()
             nascimento = st.date_input("Data de Nascimento", min_value, min_value=min_value)
             naturalidade = st.text_input("Naturalidade")
             salario = st.number_input("Salário", min_value=0, step=100)
@@ -56,7 +56,7 @@ def display_create(user_type):
             fields["CPF"] = cpf
             fields["Cargo"] = cargo
             fields["Gênero"] = genero
-            fields["Data de Nascimento"] = nascimento
+            fields["data_nascimento"] = nascimento
             fields["Naturalidade"] = naturalidade
             fields["Salário"] = salario
 
