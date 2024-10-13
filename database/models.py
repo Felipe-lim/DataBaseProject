@@ -1,20 +1,24 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean, PrimaryKeyConstraint, ForeignKeyConstraint
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Boolean, PrimaryKeyConstraint, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from database.db import Base
 
 class Pessoa(Base):
-    __tablename__ = "pessoas"
+   __tablename__ = "pessoas"
 
-    id = Column(String, primary_key=True, index=True)
-    nome = Column(String, index=True)
-    endereco = Column(String)
-    email = Column(String)
-    telefone = Column(String)
-    cep = Column(String)
+   id = Column(String, primary_key=True, index=True)
+   nome = Column(String, index=True)
+   endereco = Column(String)
+   email = Column(String)
+   telefone = Column(String)
+   cep = Column(String)
 
-    fornecedor = relationship("Fornecedor", back_populates="pessoa", uselist=False)
-    cliente = relationship("Cliente", back_populates="pessoa", uselist=False)
-    funcionario = relationship("Funcionario", back_populates="pessoa", uselist=False)
+   __table_args__ = (
+      UniqueConstraint('telefone', name='uq_pessoa_telefone'),
+   )
+    
+   fornecedor = relationship("Fornecedor", back_populates="pessoa", uselist=False)
+   cliente = relationship("Cliente", back_populates="pessoa", uselist=False)
+   funcionario = relationship("Funcionario", back_populates="pessoa", uselist=False)
 
 class Fornecedor(Base):
     __tablename__ = "fornecedores"
