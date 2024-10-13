@@ -13,6 +13,12 @@ st.set_page_config(
 )
 
 def display_pages():
+   st.set_page_config(
+    page_title="Clorofila Gerenciamento",
+    page_icon="🌱",
+    layout="wide",
+)
+
    st.sidebar.title("Navegação")
    page = st.sidebar.radio("Ir para:", ["Início", "Gerenciar Usuários","Relatórios", "Pedidos", "Vendas", "Estoque"])
 
