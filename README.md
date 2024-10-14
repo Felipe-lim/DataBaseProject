@@ -4,9 +4,9 @@ Este projeto é um sistema de gerenciamento para uma floricultura, desenvolvido 
 
 ## Desenvolvedores
 
-- [Felipe Lima](github.com/felipe-lim)
-- [Fernando D'ávila](github.com/taldofernando)
-- [Victor Marques](github.com/victornw)
+- [Felipe Lima](https://github.com/felipe-lim)
+- [Fernando D'ávila](https://github.com/taldofernando)
+- [Victor Marques](https://github.com/victornw)
 
 ## Funcionalidades
 
