@@ -67,36 +67,3 @@ def show_estoque():
     else:
         st.write("Nenhum produto disponível no estoque.")
 
-    # Opção de editar dados de um produto específico
-    st.subheader("Editar Informações de um Produto")
-
-        # Escolha o nome do produto (que será dividido em especie e variedade)
-    nome_produto = st.selectbox("Nome do Produto", df['Nome'].unique())
-
-    # Quebra o nome em espécie e variedade
-    especie_produto, variedade_produto = nome_produto.split(" ", 1)
-
-    # Campos para modificar a quantidade, custo e preço
-    nova_quantidade = st.number_input("Nova Quantidade do Produto", step=1, min_value=0)
-    novo_preco = st.number_input("Novo Preço do Produto", step=1)
-    novo_custo = st.number_input("Novo Custo do Produto", step=1)
-
-
-        # Botão para atualizar as informações
-    if st.button("Atualizar Informações"):
-        if especie_produto and variedade_produto and nova_quantidade is not None and novo_preco is not None and novo_custo is not None:
-            # Chama a procedure para atualizar os dados
-            produto_atualizado = update_estoque_info(
-                db,
-                especie_produto=especie_produto,
-                variedade_produto=variedade_produto,
-                nova_quantidade=nova_quantidade,
-                novo_custo=novo_custo,
-                novo_preco=novo_preco
-            )
-            if produto_atualizado:
-                st.success(f"Informações do produto {nome_produto} atualizadas com sucesso!")
-            else:
-                st.error("Erro ao atualizar o produto.")
-        else:
-            st.error("Preencha todos os campos antes de atualizar.")
