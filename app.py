@@ -6,6 +6,11 @@ from pags.orders.Compra import display_compras
 from pags.orders.Estoque import show_estoque
 from pags.sales.Vendas import display_vendas
 
+st.set_page_config(
+   page_title="Clorofila Gerenciamento",
+   page_icon="🌱",
+   layout="wide",
+)
 
 def display_pages():
    st.sidebar.title("Navegação")
